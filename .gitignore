@@ -2,6 +2,10 @@
 *.rbc
 *.pub
 .vagrant/
+release-*
+join.sh
+kubeconfig
+external-snapshotter*
 
 *.log
 /.config

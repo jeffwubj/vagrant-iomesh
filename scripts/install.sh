@@ -36,7 +36,8 @@ sudo apt-get install open-iscsi -y
 sudo sed -i 's/^node.startup = automatic$/node.startup = manual/' /etc/iscsi/iscsid.conf
 sudo systemctl enable --now iscsid
 
-sudo bash -c "curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -"
+curl -O https://packages.cloud.google.com/apt/doc/apt-key.gpg
+sudo apt-key add apt-key.gpg
 sudo bash -c "cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
 deb http://apt.kubernetes.io/ kubernetes-xenial main
 EOF"

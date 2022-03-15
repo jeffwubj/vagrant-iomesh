@@ -1,6 +1,6 @@
 Vagrant.configure("2") do |config|
     config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
-    config.vm.provision :shell, privileged: true, path: "install.sh"
+    config.vm.provision :shell, privileged: true, path: "./scripts/install.sh"
   
     config.vm.define :master do |master|
       master.vm.provider :virtualbox do |vb|
@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
       master.disksize.size = "50GB"
       master.vm.hostname = "master"
       master.vm.network :private_network, ip: "10.0.0.10"
-      master.vm.provision :shell, privileged: false, path: "provision_master.sh"
+      master.vm.provision :shell, privileged: false, path: "./scripts/provision_master.sh"
     end
   
     %w{node1 node2 node3}.each_with_index do |name, i|
@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
         node.vm.provider "virtualbox" do |vb|
           vb.name = "node#{i + 1}"
           vb.memory = 4096
-          vb.cpus = 2
+          vb.cpus = 4
         end
         node.vm.box = "ubuntu/bionic64"
         node.disksize.size = "50GB"
@@ -33,6 +33,15 @@ Vagrant.configure("2") do |config|
   sudo systemctl daemon-reload
   sudo systemctl restart kubelet
   SHELL
+        if node.vm.hostname == "node3"
+            node.vm.provision :shell, privileged: false, inline: <<-SHELL
+            mkdir -p $HOME/.kube
+            sudo cp -i /vagrant/kubeconfig $HOME/.kube/config
+            sudo chown $(id -u):$(id -g) $HOME/.kube/config          
+            cp /vagrant/scripts/install_iomesh_el7.sh $HOME/
+            bash $HOME/install_iomesh_el7.sh
+            SHELL
+        end
       end
     end
   

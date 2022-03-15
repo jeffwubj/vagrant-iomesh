@@ -17,14 +17,15 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 sudo mkdir -p /root/.kube
 sudo cp -i /etc/kubernetes/admin.conf /root/.kube/config
 sudo chown -R root:root /root/.kube
-sudo cp -i /etc/kubernetes/admin.conf /vagrant/config
 # Fix kubelet IP
 echo 'Environment="KUBELET_EXTRA_ARGS=--node-ip=10.0.0.10"' | sudo tee -a /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
 # Use our flannel config file so that routing will work properly
-kubectl create -f /vagrant/kube-flannel.yml
+kubectl create -f /vagrant/config/kube-flannel.yml
 # Set alias on master for vagrant and root users
 echo "alias k=/usr/bin/kubectl" >> $HOME/.bash_profile
 # Install the etcd client
 sudo apt install etcd-client
 sudo systemctl daemon-reload
 sudo systemctl restart kubelet
+sudo rm -rf /vagrant/kubeconfig
+sudo cp -i $HOME/.kube/config /vagrant/kubeconfig
